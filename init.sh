@@ -1,3 +1,6 @@
+# immediatley exit if error occur.
+set -e
+
 cert="/etc/ssl/certs/hello.crt"
 key="/etc/ssl/hello.key"
 
@@ -6,40 +9,43 @@ sudo setenforce 0
 
 # update yum.
 echo -e "\e[32mUpdating yum...\e[0m"
-sudo yum -y update
+sudo yum -y update && echo -e "\e[32mDone.\e[0m "
 
 # install apache.
 echo -e "\e[32mInstalling apache server (httpd)...\e[0m"
-sudo yum -y install httpd
+sudo yum -y install httpd && echo -e "\e[32mDone.\e[0m "
 
 # install openssl apache mod.
-sudo yum -y install mod_ssl
+echo -e "\e[32mInstalling openssl apache mod...\e[0m"
+sudo yum -y install mod_ssl && echo -e "\e[32mDone.\e[0m "
 
 # install bind dns server.
-sudo yum -y bind bind-utils
+echo -e "\e[32mInstalling bind dns server...\e[0m"
+sudo yum -y bind bind-utils && echo -e "\e[32mDone.\e[0m "
 
-# install wireshark.
-sudo yum -y install wireshark
+# updating resolve.conf to use localhost as dns server.
+echo -e "\e[32mUpdating local dns resolve file...\e[0m"
+sudo cp resolve.conf /etc && echo -e "\e[32mDone.\e[0m "
 
 # move index.html to apache document root folder.
 echo -e "\e[32mCopying index.html to default apache document root folder...\e[0m"
-sudo cp index.html /var/www/html
+sudo cp index.html /var/www/html && echo -e "\e[32mDone.\e[0m "
 
 # generate a certificate and a private key.
 echo -e "\e[32mGenerating certificate and key files...\e[0m"
-sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $key -out $cert -subj "/C=--/ST=--/L=-/O=-/OU=-/CN=-"
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $key -out $cert -subj "/C=--/ST=--/L=-/O=-/OU=-/CN=-" && echo -e "\e[32mDone.\e[0m "
 
 # copy hello.conf to apache custom configurations folder.
 echo -e "\e[32mCopying virtual host file to apache server configuration folder...\e[0m"
-sudo cp hello.conf /etc/httpd/conf.d/
+sudo cp hello.conf /etc/httpd/conf.d/ && echo -e "\e[32mDone.\e[0m "
 
 # start named dns service.
 echo -e "\e[32mStarting dns server...\e[0m"
-sudo systemctl start named
+sudo systemctl start named && echo -e "\e[32mDone.\e[0m "
 
 # start apache server.
 echo -e "\e[32mStarting apache server...\e[0m"
-sudo systemctl start httpd
+sudo systemctl start httpd && echo -e "\e[32mDone.\e[0m "
 
 # test server response on port 80.
 echo -e "\e[32mTesting index.html response on port 80...\e[0m"
